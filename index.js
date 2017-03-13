@@ -69,7 +69,7 @@ module.exports.refresh = function (oauthToken) {
 
 module.exports.account = function (oauthToken) {
 	return new Promise(function (resolve, reject) {
-		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin/";
+		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin";
 		axios.defaults.headers = {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
@@ -87,7 +87,7 @@ module.exports.account = function (oauthToken) {
 module.exports.fetch = function (oauthToken, email) {
 	return new Promise(function (resolve, reject) {
 		// store.myshopify.com/admin/customers/search.json?query=email:name@domain.com&fields=email,id
-		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin/";
+		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin";
 		axios.defaults.headers = {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
