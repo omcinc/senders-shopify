@@ -114,7 +114,7 @@ module.exports.fetch = function (oauthToken, email) {
 
 function displayCustomer(customer) {
 	var res = '';
-	res += '_Orders Count_:' + customer.orders_count;
+	res += '_Orders Count:_ ' + customer.orders_count;
 	res += ' - _Total Spent:_ $' + customer.total_spent;
 	if (customer.last_order_name) {
 		res += ' - _Last order:_ ' + customer.last_order_name;
