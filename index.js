@@ -75,7 +75,8 @@ module.exports.account = function (oauthToken) {
 		};
 		console.log('Getting account details for: ' + axios.defaults.baseURL);
 		getShop().subscribe(res => {
-			console.log("Got Shop: " + util.inspect(res));
+			console.log("Name: " + res.shop.name);
+			console.log("Domain: " + res.shop.domain);
 			resolve({
 				loginName: res.shop.name,
 				accountUrl: 'https://' + res.shop.domain
