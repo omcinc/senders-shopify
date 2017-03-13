@@ -73,10 +73,7 @@ module.exports.account = function (oauthToken) {
 		axios.defaults.headers = {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
-		console.log('Getting account details for: ' + axios.defaults.baseURL);
 		getShop().subscribe(res => {
-			console.log("Name: " + res.shop.name);
-			console.log("Domain: " + res.shop.domain);
 			resolve({
 				loginName: res.shop.name,
 				accountUrl: 'https://' + res.shop.domain
@@ -94,99 +91,36 @@ module.exports.fetch = function (oauthToken, email) {
 		axios.defaults.headers = {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
-		const getMembershipsFromEmail = function (client) {
-			return getMemberships(client, email);
-		};
-		getClients()
-			.flatMap(clients => {
-				// Limitation: for now, only get the first client
-				return Rx.Observable.of(clients[0]).flatMap(client => {
-					return Rx.Observable.forkJoin(
-						getLists(client),
-						getMembershipsFromEmail(client)
-					);
-				});
-			})
-			.toArray()
-			.subscribe(clientLists => {
-				const allMemberships = [];
-				clientLists.forEach(listAndMembership => {
-					// Lists are not used for now...
-//					const lists = listAndMembership[0];
-					const memberships = listAndMembership[1];
-					memberships.forEach(membership => {
-						allMemberships.push(membership);
-					});
-				});
-				// https://www.campaignmonitor.com/api/clients/#getting-lists-email-address
+		searchCustomer(email).subscribe(res => {
+			const customers = res.customers;
+			if (customers && customers.length > 1) {
+				const customer = customers[0];
 				resolve({
 					icon: 'https://storage.googleapis.com/senders-images/cards/shopify.png',
-					text: displayMemberships(allMemberships)
+					text: displayCustomer(customer)
 				});
-			}, error => {
-				reject(normalizeError(error));
-			});
+			} else {
+				resolve({
+					icon: 'https://storage.googleapis.com/senders-images/cards/shopify.png',
+					text: 'No customer data for this Sender.'
+				});
+			}
+		}, error => {
+			reject(normalizeError(error));
+		});
 	});
 
 };
 
-module.exports.displayMemberships = displayMemberships;
-
-function compareMemberships(a, b) {
-	if (a.DateSubscriberAdded < b.DateSubscriberAdded) {
-		return -1;
-	} else if (a.DateSubscriberAdded > b.DateSubscriberAdded) {
-		return 1;
-	} else {
-		return 0;
+function displayCustomer(customer) {
+	var res = '';
+	res += '_Orders:_' + customer.orders_count;
+	res += ' - _Total Spent:_ $' + customer.total_spent;
+	if (customer.last_order_name) {
+		res += ' _Last order:_ ' + customer.last_order_name;
 	}
+	return res;
 }
-
-/**
- * [
- *  {
- * 		 "ListID": "a58ee1d3039b8bec838e6d1482a8a965",
- * 		 "ListName": "List One",
- * 		 "SubscriberState": "Active",
- * 		 "DateSubscriberAdded": "2010-03-19 11:15:00"
- *  },
- *  {
- * 		 "ListID": "99bc35084a5739127a8ab81eae5bd305",
- * 		 "ListName": "List Two",
- * 		 "SubscriberState": "Unsubscribed",
- * 		 "DateSubscriberAdded": "2011-04-01 01:27:00"
- *  }
- * ]
- */
-function displayMemberships(memberships) {
-	const stateNames = {
-		"Active": "Subscribed to",
-		"Unsubscribed": "Unsubscribed from",
-		"Unconfirmed": "Pending for",
-		"Bounced": "Bounced from",
-		"Deleted": "Deleted from",
-	};
-	var text = '';
-	if (memberships.length == 0) {
-		text = "Not in any list.";
-	} else {
-		Object.keys(stateNames).forEach(s => {
-			const members = memberships.filter(m => { return s == m.SubscriberState; });
-			if (members.length > 0) {
-				members.sort(compareMemberships);
-				text += '_' + stateNames[s] + '_ ';
-				text += members.slice(0, 2).map(m => m.ListName).join(', ');
-				if (members.length > 2) {
-					text += ' and ' + (members.length - 2) + ' more. ';
-				} else {
-					text += '. ';
-				}
-			}
-		});
-	}
-	return text;
-}
-
 
 /**
  * @param internalError
@@ -238,15 +172,6 @@ function getShop() {
 	return Rx.Observable.fromPromise(axios.get('/shop.json')).map(res => res.data);
 }
 
-function getClients() {
-	return Rx.Observable.fromPromise(axios.get('/clients.json')).map(res => res.data);
+function searchCustomer(email) {
+	return Rx.Observable.fromPromise(axios.get('/customers/search.json?query=email:' + email)).map(res => res.data);
 }
-
-function getLists(client) {
-	return Rx.Observable.fromPromise(axios.get('/clients/' + client.ClientID + '/lists.json')).map(res => res.data);
-}
-
-function getMemberships(client, email) {
-	return Rx.Observable.fromPromise(axios.get('/clients/' + client.ClientID + '/listsforemail.json?email=' + email)).map(res => res.data);
-}
-
