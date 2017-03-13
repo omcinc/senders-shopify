@@ -69,16 +69,14 @@ module.exports.refresh = function (oauthToken) {
 
 module.exports.account = function (oauthToken) {
 	return new Promise(function (resolve, reject) {
-		axios.defaults.baseURL = "https://api.createsend.com/api/v3.1";
+		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin/";
 		axios.defaults.headers = {
-			Authorization: ("Bearer " + oauthToken.accessToken)
+			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
-		getClients().subscribe(clients => {
-			// Limitation: for now, only get the first client
-			const defaultClient = clients[0];
+		getShop().subscribe(shop => {
 			resolve({
-				loginName: defaultClient.Name,
-				accountUrl: 'https://login.createsend.com'
+				loginName: shop.name,
+				accountUrl: 'https://' + shop.domain
 			});
 		}, error => {
 			reject(normalizeError(error));
@@ -89,7 +87,7 @@ module.exports.account = function (oauthToken) {
 module.exports.fetch = function (oauthToken, email) {
 	return new Promise(function (resolve, reject) {
 		// store.myshopify.com/admin/customers/search.json?query=email:name@domain.com&fields=email,id
-		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + ".myshopify.com/admin/";
+		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin/";
 		axios.defaults.headers = {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
@@ -231,6 +229,10 @@ function normalizeError(internalError) {
 		}
 	}
 	return error;
+}
+
+function getShop() {
+	return Rx.Observable.fromPromise(axios.get('/shop.json')).map(res => res.data);
 }
 
 function getClients() {
