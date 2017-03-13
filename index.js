@@ -74,11 +74,10 @@ module.exports.account = function (oauthToken) {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
 		console.log('Getting account details for: ' + axios.defaults.baseURL);
-		getShop().subscribe(shop => {
-			console.log('Shop: ' + util.inspect(shop));
+		getShop().subscribe(res => {
 			resolve({
-				loginName: shop.name,
-				accountUrl: 'https://' + shop.domain
+				loginName: res.shop.name,
+				accountUrl: 'https://' + res.shop.domain
 			});
 		}, error => {
 			reject(normalizeError(error));
