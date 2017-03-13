@@ -73,7 +73,9 @@ module.exports.account = function (oauthToken) {
 		axios.defaults.headers = {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
+		console.log('Getting account details for: ' + axios.defaults.baseURL);
 		getShop().subscribe(shop => {
+			console.log('Shop: ' + util.inspect(shop));
 			resolve({
 				loginName: shop.name,
 				accountUrl: 'https://' + shop.domain
