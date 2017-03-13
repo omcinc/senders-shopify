@@ -93,7 +93,7 @@ module.exports.fetch = function (oauthToken, email) {
 		};
 		searchCustomer(email).subscribe(res => {
 			const customers = res.customers;
-			if (customers && customers.length > 1) {
+			if (customers && customers.length > 0) {
 				const customer = customers[0];
 				resolve({
 					icon: 'https://storage.googleapis.com/senders-images/cards/shopify.png',
