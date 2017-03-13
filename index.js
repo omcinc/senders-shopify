@@ -38,7 +38,7 @@ module.exports.authorize = function (params, options) {
 	return new Promise(function (resolve, reject) {
 		const shop = params.shop;
 		const code = params.code;
-		axios.post('https://' + shop + '.myshopify.com/admin/oauth/access_token', {
+		axios.post(shop + '/admin/oauth/access_token', {
 			client_id: options.clientId,
 			client_secret: options.clientSecret,
 			code: code
