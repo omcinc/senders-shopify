@@ -1,0 +1,62 @@
+{
+  "customers": [
+    {
+      "id": 5140559698,
+      "email": "antoine@onemore.company",
+      "accepts_marketing": false,
+      "created_at": "2017-03-13T13:18:06-04:00",
+      "updated_at": "2017-03-13T19:51:18-04:00",
+      "first_name": "Antoine",
+      "last_name": "Melki",
+      "orders_count": 2,
+      "state": "disabled",
+      "total_spent": "756.00",
+      "last_order_id": 4693338258,
+      "note": "",
+      "verified_email": true,
+      "multipass_identifier": null,
+      "tax_exempt": false,
+      "phone": null,
+      "tags": "",
+      "last_order_name": "#1003",
+      "default_address": {
+        "id": 5526829330,
+        "first_name": "Antoine",
+        "last_name": "Melki",
+        "company": "",
+        "address1": "",
+        "address2": "",
+        "city": "",
+        "province": "Alabama",
+        "country": "United States",
+        "zip": "",
+        "phone": "",
+        "name": "Antoine Melki",
+        "province_code": "AL",
+        "country_code": "US",
+        "country_name": "United States",
+        "default": true
+      },
+      "addresses": [
+        {
+          "id": 5526829330,
+          "first_name": "Antoine",
+          "last_name": "Melki",
+          "company": "",
+          "address1": "",
+          "address2": "",
+          "city": "",
+          "province": "Alabama",
+          "country": "United States",
+          "zip": "",
+          "phone": "",
+          "name": "Antoine Melki",
+          "province_code": "AL",
+          "country_code": "US",
+          "country_name": "United States",
+          "default": true
+        }
+      ]
+    }
+  ]
+}

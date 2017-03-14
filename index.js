@@ -2,6 +2,7 @@ const axios = require("axios");
 const Rx = require('rxjs');
 const Promise = require("bluebird");
 const util = require('util');
+const strip = require('./strip');
 
 /**
  * Returns the oauth URL to be called from the browser to trigger the oauth process.
@@ -93,17 +94,24 @@ module.exports.fetch = function (oauthToken, email) {
 		};
 		searchCustomer(email).subscribe(res => {
 			const customers = res.customers;
+			let customer;
 			if (customers && customers.length > 0) {
-				const customer = customers[0];
-				resolve({
-					icon: 'https://storage.googleapis.com/senders-images/cards/shopify.png',
-					text: displayCustomer(customer)
-				});
+				customer = customers[0];
+				if (customer.last_order_id) {
+					getOrder(customer.last_order_id).subscribe(res => {
+						const orders = res.orders;
+						if (orders && orders.length > 0) {
+							const order = orders[0];
+							resolve(strip(customer, order));
+						} else {
+							resolve(strip(customer));
+						}
+					});
+				} else {
+					resolve(strip(customer));
+				}
 			} else {
-				resolve({
-					icon: 'https://storage.googleapis.com/senders-images/cards/shopify.png',
-					text: 'No customer data for this Sender.'
-				});
+				resolve(strip());
 			}
 		}, error => {
 			reject(normalizeError(error));
