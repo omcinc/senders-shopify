@@ -1,6 +1,6 @@
 
 module.exports = function(customer, lastOrder) {
-	let res = '';
+	var res = '';
 	if (customer) {
 		res += '_Orders:_ ' + customer.orders_count;
 		res += ' ($' + customer.total_spent + ')';

@@ -63,7 +63,7 @@ module.exports.refresh = function (oauthToken) {
 	return new Promise(function (resolve, reject) {
 		// In shopify, (offline) access tokens are permanent, so no need to refresh it, simply return the so called refresh
 		// token as an access token...
-		// TODO: optimize this on the Java side, so that if the fiest access token retrieved neever expires, we don't further call refresh
+		// TODO: optimize this on the Java side, so that if the first access token retrieved never expires, we don't further call refresh
 		resolve(oauthToken);
 	});
 };
@@ -119,16 +119,6 @@ module.exports.fetch = function (oauthToken, email) {
 	});
 
 };
-
-function displayCustomer(customer) {
-	var res = '';
-	res += '_Orders:_ ' + customer.orders_count;
-	res += ' - _Total Spent:_ $' + customer.total_spent;
-	if (customer.last_order_name) {
-		res += ' - _Last order:_ ' + customer.last_order_name;
-	}
-	return res;
-}
 
 /**
  * @param internalError
