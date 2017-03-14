@@ -94,7 +94,7 @@ module.exports.fetch = function (oauthToken, email) {
 		};
 		searchCustomer(email).subscribe(res => {
 			const customers = res.customers;
-			let customer;
+			var customer;
 			if (customers && customers.length > 0) {
 				customer = customers[0];
 				if (customer.last_order_id) {
