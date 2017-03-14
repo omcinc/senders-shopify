@@ -13,7 +13,7 @@ const util = require('util');
  * @returns {String} The OAuth URL
  */
 module.exports.oauth = function (params, options) {
-	const scope = 'read_customers';
+	const scope = 'read_customers,read_orders';
 	return 'https://' + params.shop
 		+'.myshopify.com/admin/oauth/authorize'
 		+ '?client_id='+options.clientId+'&scope=' + scope
@@ -114,7 +114,7 @@ module.exports.fetch = function (oauthToken, email) {
 
 function displayCustomer(customer) {
 	var res = '';
-	res += '_Orders Count:_ ' + customer.orders_count;
+	res += '_Orders:_ ' + customer.orders_count;
 	res += ' - _Total Spent:_ $' + customer.total_spent;
 	if (customer.last_order_name) {
 		res += ' - _Last order:_ ' + customer.last_order_name;
@@ -175,3 +175,15 @@ function getShop() {
 function searchCustomer(email) {
 	return Rx.Observable.fromPromise(axios.get('/customers/search.json?query=email:' + email)).map(res => res.data);
 }
+
+/**
+ * Get Order by ID.
+ * See https://help.shopify.com/api/reference/order
+ *
+ * @param id
+ * @returns {Observable<R>}
+ */
+function getOrder(id) {
+	return Rx.Observable.fromPromise(axios.get('/orders.json?ids=' + id)).map(res => res.data);
+}
+
