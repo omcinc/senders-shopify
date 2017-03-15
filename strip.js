@@ -40,9 +40,18 @@ module.exports = function (shop, customer, lastOrder) {
 	} else {
 		res = 'No customer data.';
 	}
+	var link = null;
+	if (shop && shop.domain) {
+		if (customer && customer.id) {
+			link = 'https://' + shop.domain + '/admin/customers/' + customer.id;
+		} else {
+			link = 'https://' + shop.domain + '/admin';
+		}
+	}
 	return {
 		icon: 'https://storage.googleapis.com/senders-images/cards/shopify.png',
-		text: res
+		text: res,
+		link: link
 	};
 };
 

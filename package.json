@@ -4,7 +4,7 @@
   "description": "Search and Get Shopify information about customers",
   "main": "index.js",
   "scripts": {
-    "test": "node test",
+    "test": "node test/test.js",
     "build": "node build && rm senders-lambda.zip; zip -r senders-lambda.zip index.js node_modules scripts www",
     "deploy": "node deploy.js",
     "update": "npm update @adonf98/senders-cms-data @adonf98/senders-website-utils angular-expander"
