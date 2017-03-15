@@ -14,9 +14,9 @@ Promise.all([
 	const orders = JSON.parse(res[1]).orders;
 	const strip1 = strip(customers[0], orders[0]);
 	assert.equal('https://storage.googleapis.com/senders-images/cards/shopify.png', strip1.icon);
-	assert.equal(strip1.text, '_Orders:_ 2 ($756.00) - _Last order:_ #1003 ($700.00) - imported on March 14th, 2017 - paid - not fulfilled');
+	assert.equal(strip1.text, 'Customer added 2 days ago. 2 orders ($756)\nLast order 2 days ago _#1003_ ($700) IPhone 7 - paid - not fulfilled');
 	const strip2 = strip(customers[0], orders[1]);
-	assert.equal(strip2.text, '_Orders:_ 2 ($756.00) - _Last order:_ #1003 ($56.00) - closed on March 13th, 2017 - paid - fulfilled');
+	assert.equal(strip2.text, 'Customer added 2 days ago. 2 orders ($756)\nLast order closed 2 days ago _#1003_ ($56) T-Shirt cool - paid - fulfilled');
 	console.log('Test OK');
 }).catch(err => {
 	console.log(util.inspect(err));

@@ -1,27 +1,31 @@
-const dateFormat = require('dateformat');
-const format = "mm/dd/yyyy";
+const moment = require('moment');
 
-module.exports = function(customer, lastOrder) {
+module.exports = function (customer, lastOrder) {
 	var res = '';
 	if (customer) {
 		if (customer.created_at) {
-			res += '_Added_ ' + dateFormat(new Date(customer.created_at), format) + '. ';
+			res += 'Customer added ' + moment(customer.created_at).fromNow() + '. ';
 		}
-		res += customer.orders_count + ' orders ';
-		res += ' ($' + customer.total_spent + ')';
+		res += customer.orders_count + ' orders';
+		res += ' (' + currency(customer.total_spent) + ')';
 		if (customer.last_order_name && lastOrder) {
-			res += '\n\n_Last order:_ ' + customer.last_order_name;
-			res += ' ($' + lastOrder.total_price + ')';
+			res += '\nLast order';
 			if (lastOrder.cancelled_at) {
-				res += ' - cancelled on ' + dateFormat(new Date(lastOrder.cancelled_at), format);
+				res += ' cancelled ' + moment(lastOrder.cancelled_at).fromNow();
 			} else if (lastOrder.closed_at) {
-				res += ' - closed on ' + dateFormat(new Date(lastOrder.closed_at), format);
+				res += ' closed ' + moment(lastOrder.closed_at).fromNow();
 			} else if (lastOrder.processed_at) {
-				res += ' - imported on ' + dateFormat(new Date(lastOrder.processed_at), format);
-			} else if (lastOrder.updated_at) {
-				res += ' - last updated on ' + dateFormat(new Date(lastOrder.updated_at), format);
+				res += ' ' + moment(lastOrder.processed_at).fromNow();
+			// } else if (lastOrder.updated_at) {
+			// 	res += ' ' + moment(lastOrder.updated_at).fromNow();
 			} else if (lastOrder.created_at) {
-				res += ' - created on ' + dateFormat(new Date(lastOrder.created_at), format);
+				res += ' ' + moment(lastOrder.created_at).fromNow();
+			}
+			res += ' _' + customer.last_order_name + '_';
+			res += ' (' + currency(lastOrder.total_price) + ')';
+			var items = lastOrder.line_items;
+			if (items && items.length > 0) {
+				res += ' ' + items.map(item => item.name).join(', ');
 			}
 			if (lastOrder.financial_status) {
 				res += ' - ' + lastOrder.financial_status;
@@ -40,3 +44,11 @@ module.exports = function(customer, lastOrder) {
 		text: res
 	};
 };
+
+function currency(n) {
+	var num = Number.parseFloat(n);
+	if (num - Math.floor(num) == 0) {
+		return "$" + Math.floor(num);
+	}
+	return "$" + n;
+}
