@@ -1,13 +1,14 @@
 const moment = require('moment');
+const currencyFormatter = require('currency-formatter');
 
-module.exports = function (customer, lastOrder) {
+module.exports = function (shop, customer, lastOrder) {
 	var res = '';
 	if (customer) {
 		if (customer.created_at) {
 			res += 'Customer added ' + moment(customer.created_at).fromNow() + '. ';
 		}
 		res += customer.orders_count + ' orders';
-		res += ' (' + currency(customer.total_spent) + ')';
+		res += ' (' + currency(customer.total_spent, shop) + ')';
 		if (customer.last_order_name && lastOrder) {
 			res += '\nLast order';
 			if (lastOrder.cancelled_at) {
@@ -22,7 +23,7 @@ module.exports = function (customer, lastOrder) {
 				res += ' ' + moment(lastOrder.created_at).fromNow();
 			}
 			res += ' _' + customer.last_order_name + '_';
-			res += ' (' + currency(lastOrder.total_price) + ')';
+			res += ' (' + currency(lastOrder.total_price, shop) + ')';
 			var items = lastOrder.line_items;
 			if (items && items.length > 0) {
 				res += ' ' + items.map(item => item.name).join(', ');
@@ -45,10 +46,9 @@ module.exports = function (customer, lastOrder) {
 	};
 };
 
-function currency(n) {
+function currency(n, shop) {
 	var num = Number.parseFloat(n);
-	if (num - Math.floor(num) == 0) {
-		return "$" + Math.floor(num);
-	}
-	return "$" + n;
+	var precision = (((num - Math.floor(num)) > 0) ? 2 : 0);
+	var currency = shop && shop.currency || "USD";
+	return currencyFormatter.format(num, { code: currency, precision: precision });
 }

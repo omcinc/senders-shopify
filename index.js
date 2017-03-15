@@ -92,8 +92,12 @@ module.exports.fetch = function (oauthToken, email) {
 		axios.defaults.headers = {
 			"X-Shopify-Access-Token": oauthToken.accessToken
 		};
-		searchCustomer(email).subscribe(res => {
-			const customers = res.customers;
+		Rx.Observable.forkJoin(
+			getShop(),
+			searchCustomer(email)
+		).subscribe(res => {
+			const shop = res[0].shops;
+			const customers = res[1].customers;
 			var customer;
 			if (customers && customers.length > 0) {
 				customer = customers[0];
@@ -102,16 +106,16 @@ module.exports.fetch = function (oauthToken, email) {
 						const orders = res.orders;
 						if (orders && orders.length > 0) {
 							const order = orders[0];
-							resolve(strip(customer, order));
+							resolve(strip(shop, customer, order));
 						} else {
-							resolve(strip(customer));
+							resolve(strip(shop, customer));
 						}
 					});
 				} else {
-					resolve(strip(customer));
+					resolve(strip(shop, customer));
 				}
 			} else {
-				resolve(strip());
+				resolve(strip(shop));
 			}
 		}, error => {
 			reject(normalizeError(error));
