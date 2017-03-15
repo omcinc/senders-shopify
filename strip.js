@@ -1,13 +1,16 @@
 const dateFormat = require('dateformat');
-const format = "mmmm dS, yyyy";
+const format = "dS, yyyy";
 
 module.exports = function(customer, lastOrder) {
 	var res = '';
 	if (customer) {
-		res += '_Orders:_ ' + customer.orders_count;
+		if (customer.created_at) {
+			res += 'Added ' + dateFormat(new Date(customer.created_at)) + '. ';
+		}
+		res += customer.orders_count + ' orders ';
 		res += ' ($' + customer.total_spent + ')';
 		if (customer.last_order_name && lastOrder) {
-			res += ' - _Last order:_ ' + customer.last_order_name;
+			res += '\n_Last order:_ ' + customer.last_order_name;
 			res += ' ($' + lastOrder.total_price + ')';
 			if (lastOrder.cancelled_at) {
 				res += ' - cancelled on ' + dateFormat(new Date(lastOrder.cancelled_at), format);
@@ -30,7 +33,7 @@ module.exports = function(customer, lastOrder) {
 			}
 		}
 	} else {
-		res = 'No customer data for this Sender.';
+		res = 'No customer data.';
 	}
 	return {
 		icon: 'https://storage.googleapis.com/senders-images/cards/shopify.png',
