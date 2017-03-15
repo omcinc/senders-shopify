@@ -1,16 +1,16 @@
 const dateFormat = require('dateformat');
-const format = "dS, yyyy";
+const format = "mm/dd/yyyy";
 
 module.exports = function(customer, lastOrder) {
 	var res = '';
 	if (customer) {
 		if (customer.created_at) {
-			res += 'Added ' + dateFormat(new Date(customer.created_at)) + '. ';
+			res += '_Added_ ' + dateFormat(new Date(customer.created_at), format) + '. ';
 		}
 		res += customer.orders_count + ' orders ';
 		res += ' ($' + customer.total_spent + ')';
 		if (customer.last_order_name && lastOrder) {
-			res += '\n_Last order:_ ' + customer.last_order_name;
+			res += '\n\n_Last order:_ ' + customer.last_order_name;
 			res += ' ($' + lastOrder.total_price + ')';
 			if (lastOrder.cancelled_at) {
 				res += ' - cancelled on ' + dateFormat(new Date(lastOrder.cancelled_at), format);
