@@ -10,7 +10,7 @@ module.exports = function (shop, customer, lastOrder) {
 		res += customer.orders_count + ' orders';
 		res += ' (' + currency(customer.total_spent, shop) + ')';
 		if (customer.last_order_name && lastOrder) {
-			res += '\nLast order';
+			res += '\n\nLast order';
 			if (lastOrder.cancelled_at) {
 				res += ' cancelled ' + moment(lastOrder.cancelled_at).fromNow();
 			} else if (lastOrder.closed_at) {
