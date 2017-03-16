@@ -96,7 +96,7 @@ module.exports.fetch = function (oauthToken, email) {
 			getShop(),
 			searchCustomer(email)
 		).subscribe(res => {
-			const shop = res[0].shops;
+			const shop = res[0].shop;
 			const customers = res[1].customers;
 			var customer;
 			if (customers && customers.length > 0) {
