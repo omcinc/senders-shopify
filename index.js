@@ -110,6 +110,8 @@ module.exports.fetch = function (oauthToken, email) {
 						} else {
 							resolve(strip(shop, customer));
 						}
+					}, error => {
+						reject(normalizeError(error));
 					});
 				} else {
 					resolve(strip(shop, customer));
@@ -181,9 +183,6 @@ function searchCustomer(email) {
 /**
  * Get Order by ID.
  * See https://help.shopify.com/api/reference/order
- *
- * @param id
- * @returns {Observable<R>}
  */
 function getOrder(id) {
 	return Rx.Observable.fromPromise(axios.get('/orders.json?ids=' + id)).map(res => res.data);
