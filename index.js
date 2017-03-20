@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 const axios = require("axios");
 const Rx = require('rxjs');
 const Promise = require("bluebird");
@@ -68,13 +69,18 @@ module.exports.refresh = function (oauthToken) {
 	});
 };
 
+function config(oauthToken) {
+	return {
+		baseURL: "https://" + oauthToken.metadata.shop + "/admin",
+		headers: {
+			"X-Shopify-Access-Token": oauthToken.accessToken
+		}
+	};
+}
+
 module.exports.account = function (oauthToken) {
 	return new Promise(function (resolve, reject) {
-		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin";
-		axios.defaults.headers = {
-			"X-Shopify-Access-Token": oauthToken.accessToken
-		};
-		getShop().subscribe(res => {
+		getShop(config(oauthToken)).subscribe(res => {
 			resolve({
 				loginName: res.shop.name,
 				accountUrl: 'https://' + res.shop.domain
@@ -88,13 +94,10 @@ module.exports.account = function (oauthToken) {
 module.exports.fetch = function (oauthToken, email) {
 	return new Promise(function (resolve, reject) {
 		// store.myshopify.com/admin/customers/search.json?query=email:name@domain.com&fields=email,id
-		axios.defaults.baseURL = "https://" + oauthToken.metadata.shop + "/admin";
-		axios.defaults.headers = {
-			"X-Shopify-Access-Token": oauthToken.accessToken
-		};
+		const config = config(oauthToken);
 		Rx.Observable.forkJoin(
-			getShop(),
-			searchCustomer(email)
+			getShop(config),
+			searchCustomer(config, email)
 		).subscribe(res => {
 			const shop = res[0].shop;
 			const customers = res[1].customers;
@@ -102,7 +105,7 @@ module.exports.fetch = function (oauthToken, email) {
 			if (customers && customers.length > 0) {
 				customer = customers[0];
 				if (customer.last_order_id) {
-					getOrder(customer.last_order_id).subscribe(res => {
+					getOrder(config, customer.last_order_id).subscribe(res => {
 						const orders = res.orders;
 						if (orders && orders.length > 0) {
 							const order = orders[0];
@@ -172,19 +175,19 @@ function normalizeError(internalError) {
 	return error;
 }
 
-function getShop() {
-	return Rx.Observable.fromPromise(axios.get('/shop.json')).map(res => res.data);
+function getShop(config) {
+	return Rx.Observable.fromPromise(axios.get('/shop.json', config)).map(res => res.data);
 }
 
-function searchCustomer(email) {
-	return Rx.Observable.fromPromise(axios.get('/customers/search.json?query=email:' + email)).map(res => res.data);
+function searchCustomer(config, email) {
+	return Rx.Observable.fromPromise(axios.get('/customers/search.json?query=email:' + email, config)).map(res => res.data);
 }
 
 /**
  * Get Order by ID.
  * See https://help.shopify.com/api/reference/order
  */
-function getOrder(id) {
-	return Rx.Observable.fromPromise(axios.get('/orders.json?ids=' + id)).map(res => res.data);
+function getOrder(config, id) {
+	return Rx.Observable.fromPromise(axios.get('/orders.json?ids=' + id, config)).map(res => res.data);
 }
 
