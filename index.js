@@ -69,7 +69,7 @@ module.exports.refresh = function (oauthToken) {
 	});
 };
 
-function config(oauthToken) {
+function makeConfig(oauthToken) {
 	return {
 		baseURL: "https://" + oauthToken.metadata.shop + "/admin",
 		headers: {
@@ -80,7 +80,7 @@ function config(oauthToken) {
 
 module.exports.account = function (oauthToken) {
 	return new Promise(function (resolve, reject) {
-		getShop(config(oauthToken)).subscribe(res => {
+		getShop(makeConfig(oauthToken)).subscribe(res => {
 			resolve({
 				loginName: res.shop.name,
 				accountUrl: 'https://' + res.shop.domain
@@ -94,7 +94,7 @@ module.exports.account = function (oauthToken) {
 module.exports.fetch = function (oauthToken, email) {
 	return new Promise(function (resolve, reject) {
 		// store.myshopify.com/admin/customers/search.json?query=email:name@domain.com&fields=email,id
-		const config = config(oauthToken);
+		const config = makeConfig(oauthToken);
 		Rx.Observable.forkJoin(
 			getShop(config),
 			searchCustomer(config, email)
